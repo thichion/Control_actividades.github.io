@@ -1,0 +1,108 @@
+body {
+    display: flex;
+    flex-direction: column; /* Apila los elementos verticalmente */
+    justify-content: center; /* Centra los elementos verticalmente en el contenedor */
+    align-items: center; /* Centra los elementos horizontalmente en el contenedor */
+    min-height: 100vh; /* Asegura que el body ocupe toda la altura de la ventana */
+    margin: 0; /* Elimina el margen predeterminado del body */
+    background-color: #f0f4f8; /* Color de fondo suave */
+}
+h1 {
+    font-family: 'Rubik', sans-serif;
+    font-weight: 700; /* Usar el peso negrita que importamos (700) */
+    color: #333;
+}
+p {
+    font-family: 'Lato', sans-serif;
+    font-weight: 500; /* Usar el peso normal (400) */
+    line-height: 1.6; /* Mejorar la legibilidad */
+}
+h2{
+    font-family: 'Rubik', sans-serif;
+    font-weight: 700; /* Usar el peso negrita que importamos (700) */
+    color: #333;
+}
+.center{
+    text-align: center;
+}
+.row {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.mensaje {
+    /* Por defecto, los mensajes están ocultos */
+    display: none; 
+    opacity: 0;
+
+    /* Estilos de apariencia */
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 8px;
+    font-weight: bold;
+    text-align: center;
+    color: #fff;
+    transition: opacity 0.3s ease, display 0.3s ease;
+}
+
+/* Estilo para el mensaje de aceptado */
+.aceptado {
+    width: 20rem;
+    background-color: #28a745;
+    font-family: "Mozilla Text", sans-serif;
+    font-weight: bold;
+    font-size: 1.5rem;
+    margin: 0 auto;
+}
+
+/* Estilo para el mensaje de rechazado */
+.rechazado {
+    width: 20rem;
+    background-color: #dc3545;
+    font-family: "Mozilla Text", sans-serif;
+    font-weight: bold;
+    font-size: 1.5rem;
+    margin: 0 auto;
+}
+
+/* Regla para mostrar el mensaje con una transición */
+.mensaje.show {
+    display: block; /* Vuelve a mostrar el mensaje */
+    opacity: 1;
+}
+
+/* Estilos para el mensaje dinámico */
+.message-box {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 300px;
+    padding: 15px;
+    border-radius: 8px;
+    font-weight: bold;
+    text-align: center;
+    color: #fff;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    z-index: 1000;
+}
+
+.message-box.info {
+    background-color: #007bff;
+}
+
+.message-box.success {
+    background-color: #28a745;
+}
+
+.message-box.error {
+    background-color: #dc3545;
+}
+
+.message-box.show {
+    opacity: 1;
+    pointer-events: auto;
+}
