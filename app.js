@@ -105,6 +105,40 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Rechazar solicitud
         btnRechazar.addEventListener("click", async () => {
             showMessage("Procesando rechazo...", "info");
+            
+            const { data, error } = await supabase
+                .from("Actividades")
+                .select("*")
+                .eq("id_actividades", solicitudId)
+                .single(); // 👈 trae un objeto, no array
+
+                if (error) {
+                console.error("Error al seleccionar:", error);
+                } else if (data) {
+                // 2. Insertar la misma fila (puedes modificar campos si quieres)
+                const { data: inserted, error: insertError } = await supabase
+                    .from("Registro_actividades_soporte")
+                    .insert([
+                    {
+                        id:data.id_actividades,
+                        Actividad: data.Actividad,
+                        Lugar:data.Lugar,
+                        Fecha:data.Fecha,
+                        Supervisor:data.Supervisor,
+                        Documento_estudiante:data.Numero_estudiantes,
+                        Cantidad_de_horas:data.Cantidad_de_horas,
+                        Nombre:data.Nombre,
+                        Correo: data.Correo,
+                        // Estado: data.Estado
+                    }
+                    ])
+                    .select();
+                if (insertError) {
+                    console.error("Error al insertar:", insertError);
+                } else {
+                    console.log("Fila insertada:", inserted);
+                }
+                }
             const { error: deleteError } = await supabase
                 .from("Actividades")
                 .delete()
