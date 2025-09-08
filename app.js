@@ -34,8 +34,15 @@ function toggleStaticMessage(elementId) {
 function hideButtons() {
     const btnAceptar = document.getElementById("btnAceptar");
     const btnRechazar1 = document.getElementById("btnRechazar1");
-    if (btnAceptar) btnAceptar.style.display = "none";
-    if (btnRechazar1) btnRechazar1.style.display = "none";
+    const btnRechazar2 = document.getElementById("btnRechazar2");
+    const btnVolver = document.getElementById("btnVolver");
+    const dynamicLink = document.getElementById("dynamicLink");
+    
+    if (btnAceptar) btnAceptar.style.display = 'none';
+    if (btnRechazar1) btnRechazar1.style.display = 'none';
+    if (btnRechazar2) btnRechazar2.style.display = 'none';
+    if (btnVolver) btnVolver.style.display = 'none';
+    if (dynamicLink) dynamicLink.style.display = 'none';
 }
 
 // Función para mostrar botones principales
@@ -182,4 +189,5 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     }
 });
+
 
