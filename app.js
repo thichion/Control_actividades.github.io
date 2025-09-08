@@ -5,48 +5,50 @@ const supabaseUrl = "https://otvcwvnlndxtzzmeqtcw.supabase.co";
 const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im90dmN3dm5sbmR4dHp6bWVxdGN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc3NTg0OTQsImV4cCI6MjA2MzMzNDQ5NH0.psGUAZjKc_Ic9CFeumOIwS5DNWkgtABNZlcN0iig0cE";
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-// Función para mostrar mensajes dinámicos (los pequeños que desaparecen)
+// Función para mostrar mensajes dinámicos
 function showMessage(message, type) {
-    const messageDisplay = document.getElementById('messageDisplay');
+    const messageDisplay = document.getElementById("messageDisplay");
     if (!messageDisplay) return;
 
     messageDisplay.textContent = message;
     messageDisplay.className = `center message-box ${type} show`;
 
     setTimeout(() => {
-        messageDisplay.classList.remove('show');
+        messageDisplay.classList.remove("show");
     }, 3000);
 }
 
-// Función para mostrar los mensajes estáticos (los grandes)
+// Función para mostrar mensajes estáticos
 function toggleStaticMessage(elementId) {
     const mensajeAceptado = document.getElementById("mensajeAceptado");
     const mensajeRechazado = document.getElementById("mensajeRechazado");
-    
-    // Ocultar ambos mensajes estáticos
-    mensajeAceptado.classList.remove('show');
-    mensajeRechazado.classList.remove('show');
 
-    // Mostrar solo el mensaje deseado
+    mensajeAceptado.classList.remove("show");
+    mensajeRechazado.classList.remove("show");
+
     const element = document.getElementById(elementId);
-    if (element) {
-        element.classList.add('show');
-    }
+    if (element) element.classList.add("show");
 }
 
-// Función para ocultar los botones
+// Función para ocultar botones principales
 function hideButtons() {
     const btnAceptar = document.getElementById("btnAceptar");
-    const btnRechazar = document.getElementById("btnRechazar");
-    if (btnAceptar) btnAceptar.style.display = 'none';
-    if (btnRechazar) btnRechazar.style.display = 'none';
+    const btnRechazar1 = document.getElementById("btnRechazar1");
+    if (btnAceptar) btnAceptar.style.display = "none";
+    if (btnRechazar1) btnRechazar1.style.display = "none";
 }
 
-// Lógica de inicio al cargar la página
-document.addEventListener('DOMContentLoaded', async () => {
+// Función para mostrar botones principales
+function showButtons() {
+    const btnAceptar = document.getElementById("btnAceptar");
+    const btnRechazar1 = document.getElementById("btnRechazar1");
+    if (btnAceptar) btnAceptar.style.display = "inline-block";
+    if (btnRechazar1) btnRechazar1.style.display = "inline-block";
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
     const params = new URLSearchParams(window.location.search);
 
-    // Actualizar datos visibles en la página
     document.querySelector("p.actividad").textContent = params.get("actividad") || "No definido";
     document.querySelector("p.lugar").textContent = params.get("lugar") || "No definido";
     document.querySelector("p.fecha").textContent = params.get("fecha") || "No definido";
@@ -57,35 +59,36 @@ document.addEventListener('DOMContentLoaded', async () => {
     const solicitudId = params.get("id");
     if (!solicitudId) {
         showMessage("❌ No se especificó el ID de la solicitud.", "error");
-        hideButtons(); // No hay ID, no se necesitan botones
+        hideButtons();
         return;
     }
 
-    // --- NUEVO CÓDIGO PARA VERIFICAR EL ESTADO AL CARGAR ---
     const { data, error } = await supabase
         .from("Actividades")
         .select("Estado")
         .eq("id_actividades", solicitudId)
         .single();
-    
-    if (error && error.code === 'PGRST116') {
-        // La fila no fue encontrada, lo que indica que fue eliminada
+
+    const btnAceptar = document.getElementById("btnAceptar");
+    const btnRechazar1 = document.getElementById("btnRechazar1");
+    const btnRechazar2 = document.getElementById("btnRechazar2");
+    const btnVolver = document.getElementById("btnVolver");
+    const razonForm = document.getElementById("razon_form");
+    const razonTextarea = document.getElementById("razon");
+
+    if (error && error.code === "PGRST116") {
         toggleStaticMessage("mensajeRechazado");
         hideButtons();
-        console.log("Solicitud ya rechazada (fila no encontrada).");
+        console.log("Solicitud ya rechazada (no encontrada).");
     } else if (data && data.Estado === true) {
-        // La solicitud ya fue aceptada
         toggleStaticMessage("mensajeAceptado");
         hideButtons();
         console.log("Solicitud ya aceptada.");
     } else {
-        // La solicitud está pendiente, se muestran los botones
         console.log("Solicitud pendiente.");
-        const btnAceptar = document.getElementById("btnAceptar");
-        const btnRechazar = document.getElementById("btnRechazar");
 
-        // Aceptar solicitud
-        btnAceptar.addEventListener("click", async () => {
+        // --- Aceptar ---
+        btnAceptar?.addEventListener("click", async () => {
             showMessage("Procesando aceptación...", "info");
             const { error: updateError } = await supabase
                 .from("Actividades")
@@ -93,62 +96,85 @@ document.addEventListener('DOMContentLoaded', async () => {
                 .eq("id_actividades", solicitudId);
 
             if (updateError) {
-                console.error("❌ ERROR de Supabase al aceptar:", updateError);
-                showMessage("❌ Error al aceptar la solicitud.", "error");
+                console.error("❌ Error al aceptar:", updateError);
+                showMessage("❌ Error al aceptar.", "error");
             } else {
-                showMessage("✅ Solicitud aceptada correctamente.", "success");
+                showMessage("✅ Solicitud aceptada.", "success");
                 toggleStaticMessage("mensajeAceptado");
                 hideButtons();
             }
         });
 
-        // Rechazar solicitud
-        btnRechazar.addEventListener("click", async () => {
-            showMessage("Procesando rechazo...", "info");
-            
+        // --- Rechazar1 → mostrar form ---
+        btnRechazar1?.addEventListener("click", () => {
+            hideButtons();
+            if (razonForm) razonForm.style.display = "block";
+            if (btnRechazar2) btnRechazar2.style.display = "inline-block";
+            if (btnVolver) btnVolver.style.display = "inline-block";
+        });
+
+        // --- Volver → restaurar botones principales ---
+        btnVolver?.addEventListener("click", () => {
+            if (razonForm) razonForm.style.display = "none";
+            if (btnRechazar2) btnRechazar2.style.display = "none";
+            if (btnVolver) btnVolver.style.display = "none";
+            showButtons();
+        });
+
+        // --- Rechazar2 → validar, insertar con Razon y borrar ---
+        btnRechazar2?.addEventListener("click", async () => {
+            const razonTexto = razonTextarea?.value.trim();
+            if (!razonTexto) {
+                showMessage("❌ Inserte una razón para continuar.", "error");
+                return;
+            }
+
+            showMessage("⏳ Procesando rechazo...", "info");
+
             const { data, error } = await supabase
                 .from("Actividades")
                 .select("*")
                 .eq("id_actividades", solicitudId)
-                .single(); // 👈 trae un objeto, no array
+                .single();
 
-                if (error) {
+            if (error) {
                 console.error("Error al seleccionar:", error);
-                } else if (data) {
-                // 2. Insertar la misma fila (puedes modificar campos si quieres)
-                const { data: inserted, error: insertError } = await supabase
+                return;
+            }
+
+            if (data) {
+                const { error: insertError } = await supabase
                     .from("Registro_actividades_soporte")
-                    .insert([
-                    {
-                        id:data.id_actividades,
+                    .insert([{
+                        id: data.id_actividades,
                         Actividad: data.Actividad,
-                        Lugar:data.Lugar,
-                        Fecha:data.Fecha,
-                        Supervisor:data.Supervisor,
-                        Documento_estudiante:data.Numero_estudiantes,
-                        Cantidad_de_horas:data.Cantidad_de_horas,
-                        Nombre:data.Nombre,
+                        Lugar: data.Lugar,
+                        Fecha: data.Fecha,
+                        Supervisor: data.Supervisor,
+                        Documento_estudiante: data.Numero_estudiantes,
+                        Cantidad_de_horas: data.Cantidad_de_horas,
+                        Nombre: data.Nombre,
                         Correo: data.Correo,
-                        // Estado: data.Estado
-                    }
-                    ])
-                    .select();
+                        Razon: razonTexto
+                    }]);
+
                 if (insertError) {
                     console.error("Error al insertar:", insertError);
                 } else {
-                    console.log("Fila insertada:", inserted);
+                    console.log("Fila insertada con rechazo.");
                 }
-                }
+            }
+
             const { error: deleteError } = await supabase
                 .from("Actividades")
                 .delete()
                 .eq("id_actividades", solicitudId);
 
             if (deleteError) {
-                console.error("❌ ERROR de Supabase al rechazar:", deleteError);
-                showMessage("❌ Error al rechazar (eliminar) la solicitud.", "error");
+                console.error("❌ Error al rechazar:", deleteError);
+                showMessage("❌ Error al rechazar.", "error");
             } else {
-                showMessage("✅ Solicitud eliminada correctamente.", "success");
+                showMessage("✅ Solicitud rechazada.", "success");
                 toggleStaticMessage("mensajeRechazado");
                 hideButtons();
             }
