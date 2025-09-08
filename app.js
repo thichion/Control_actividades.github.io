@@ -118,6 +118,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (razonForm) razonForm.style.display = "none";
             if (btnRechazar2) btnRechazar2.style.display = "none";
             if (btnVolver) btnVolver.style.display = "none";
+            razonTextarea.value = "";
             showButtons();
         });
 
@@ -181,3 +182,4 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     }
 });
+
